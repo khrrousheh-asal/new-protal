@@ -7,8 +7,11 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useWorkspaceTitle } from "@/hooks/useWorkspaceTitle";
 
 export default function DashboardLayout() {
+  const workspaceTitle = useWorkspaceTitle();
+
   return (
     <TooltipProvider>
       <SidebarProvider>
@@ -18,7 +21,7 @@ export default function DashboardLayout() {
             <SidebarTrigger />
             <Separator orientation="vertical" className="h-5" />
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium">Employee Portal</p>
+              <p className="truncate text-sm font-medium">{workspaceTitle}</p>
             </div>
           </header>
           <div className="flex flex-1 flex-col p-6">

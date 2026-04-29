@@ -5,13 +5,16 @@ import Profile from "@/pages/Profile";
 import Attendance from "@/pages/Attendance";
 import DocumentRequests from "@/pages/DocumentRequests";
 import Evaluation from "@/pages/Evaluation";
-import GroupManagement from "@/pages/GroupManagement";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import type { ReactNode } from "react";
-import TeamManagement from "@/pages/TeamManagement";
+import IndividualEvaluations from "@/pages/IndividualEvaluations";
+import IndividualProfiles from "@/pages/IndividualProfiles";
+import TeamAttendanceSheet from "@/pages/TeamAttendanceSheet";
+import TeamExpansionRequests from "@/pages/TeamExpansionRequests";
+import TeamOverviewPerformance from "@/pages/TeamOverviewPerformance";
+import TeamsPerformance from "@/pages/TeamsPerformance";
+import { managementRoles } from "@/config/navigation";
 import type { UserRole } from "@/types/users";
-
-const managementRoles: UserRole[] = ["admin", "manager"];
 
 function PublicOnlyRoute({ children }: { children: ReactNode }) {
   const { initialized, user } = useAuth();
@@ -67,6 +70,10 @@ function AuthRedirect() {
   return <Navigate to={user ? "/profile" : "/"} replace />;
 }
 
+function ManagementRoute({ children }: { children: ReactNode }) {
+  return <RequireRole allowedRoles={managementRoles}>{children}</RequireRole>;
+}
+
 export default function ProtectedRoute() {
   return (
     <Routes>
@@ -92,17 +99,65 @@ export default function ProtectedRoute() {
         <Route
           path="/team-management"
           element={
-            <RequireRole allowedRoles={managementRoles}>
-              <TeamManagement />
-            </RequireRole>
+            <ManagementRoute>
+              <Navigate to="/team-management/overview-performance" replace />
+            </ManagementRoute>
+          }
+        />
+        <Route
+          path="/team-management/overview-performance"
+          element={
+            <ManagementRoute>
+              <TeamOverviewPerformance />
+            </ManagementRoute>
+          }
+        />
+        <Route
+          path="/team-management/individual-evaluations"
+          element={
+            <ManagementRoute>
+              <IndividualEvaluations />
+            </ManagementRoute>
+          }
+        />
+        <Route
+          path="/team-management/team-attendance-sheet"
+          element={
+            <ManagementRoute>
+              <TeamAttendanceSheet />
+            </ManagementRoute>
           }
         />
         <Route
           path="/group-management"
           element={
-            <RequireRole allowedRoles={managementRoles}>
-              <GroupManagement />
-            </RequireRole>
+            <ManagementRoute>
+              <Navigate to="/group-management/teams-performance" replace />
+            </ManagementRoute>
+          }
+        />
+        <Route
+          path="/group-management/teams-performance"
+          element={
+            <ManagementRoute>
+              <TeamsPerformance />
+            </ManagementRoute>
+          }
+        />
+        <Route
+          path="/group-management/individual-profiles"
+          element={
+            <ManagementRoute>
+              <IndividualProfiles />
+            </ManagementRoute>
+          }
+        />
+        <Route
+          path="/group-management/team-expansion-requests"
+          element={
+            <ManagementRoute>
+              <TeamExpansionRequests />
+            </ManagementRoute>
           }
         />
       </Route>

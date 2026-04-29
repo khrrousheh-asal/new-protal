@@ -1,16 +1,5 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import {
-  CalendarDays,
-  Check,
-  ChevronsUpDown,
-  ClipboardCheck,
-  FileText,
-  LogOut,
-  Network,
-  UserRound,
-  UsersRound,
-  type LucideIcon,
-} from "lucide-react";
+import { Check, ChevronsUpDown, LogOut } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -26,7 +15,7 @@ import {
   SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,99 +26,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
-import AsalIcon from "@/../public/favicon.ico";
-import type { UserRole } from "@/types/users";
-
-type NavigationItem = {
-  title: string;
-  href: string;
-  icon: LucideIcon;
-};
-
-type WorkspaceOption = {
-  title: string;
-  description: string;
-  href: string;
-  icon: LucideIcon;
-  avatarSrc?: string;
-  activePaths?: string[];
-};
-
-const managementRoles: UserRole[] = ["admin", "manager"];
-
-const navigationItems: NavigationItem[] = [
-  {
-    title: "Profile",
-    href: "/profile",
-    icon: UserRound,
-  },
-  {
-    title: "Attendance",
-    href: "/attendance",
-    icon: CalendarDays,
-  },
-  {
-    title: "Evaluation",
-    href: "/evaluation",
-    icon: ClipboardCheck,
-  },
-  {
-    title: "Document Requests",
-    href: "/document-requests",
-    icon: FileText,
-  },
-];
-
-const employeeWorkspaceOption: WorkspaceOption = {
-  title: "Employee Portal",
-  description: "Employee workspace",
-  href: "/profile",
-  icon: UserRound,
-  avatarSrc: AsalIcon,
-  activePaths: navigationItems.map((item) => item.href),
-};
-
-const managementWorkspaceOptions: WorkspaceOption[] = [
-  {
-    title: "Team Management",
-    description: "Manage people",
-    href: "/team-management",
-    icon: UsersRound,
-  },
-  {
-    title: "Group Management",
-    description: "Manage groups",
-    href: "/group-management",
-    icon: Network,
-  },
-];
-
-const managementItems: NavigationItem[] = managementWorkspaceOptions.map(
-  ({ title, href, icon }) => ({
-    title,
-    href,
-    icon,
-  })
-);
-
-function isActivePath(pathname: string, href: string) {
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
-
-function isActiveWorkspace(pathname: string, workspace: WorkspaceOption) {
-  return (workspace.activePaths ?? [workspace.href]).some((path) =>
-    isActivePath(pathname, path)
-  );
-}
+import {
+  employeeWorkspaceOption,
+  getWorkspaceOptions,
+  isActivePath,
+  isActiveWorkspace,
+  managementRoles,
+  type NavigationItem,
+  type WorkspaceOption,
+} from "@/config/navigation";
 
 function WorkspaceAvatar({ workspace }: { workspace: WorkspaceOption }) {
   const Icon = workspace.icon;
 
   return (
     <Avatar className="size-8 rounded-lg border border-sidebar-border">
-      {workspace.avatarSrc ? (
-        <AvatarImage src={workspace.avatarSrc} alt={workspace.title} />
-      ) : null}
       <AvatarFallback className="rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
         <Icon className="size-4" />
       </AvatarFallback>
@@ -186,6 +97,7 @@ function SidebarNavGroup({
                 <SidebarMenuButton
                   asChild
                   isActive={isActivePath(pathname, item.href)}
+                  className="data-active:bg-sidebar-accent/70 data-active:text-sidebar-accent-foreground"
                   tooltip={item.title}
                 >
                   <NavLink to={item.href}>
@@ -208,10 +120,7 @@ export default function AppsideBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const canManage = user ? managementRoles.includes(user.role) : false;
-  const workspaceOptions = [
-    employeeWorkspaceOption,
-    ...(canManage ? managementWorkspaceOptions : []),
-  ];
+  const workspaceOptions = getWorkspaceOptions(canManage);
   const activeWorkspace =
     workspaceOptions.find((item) =>
       isActiveWorkspace(location.pathname, item)
@@ -258,7 +167,7 @@ export default function AppsideBar() {
                   return (
                     <DropdownMenuItem
                       key={item.href}
-                      className={cn("gap-3 p-2", isActive && "bg-accent")}
+                      className="gap-3 p-2"
                       onSelect={() => navigate(item.href)}
                     >
                       <WorkspaceAvatar workspace={item} />
@@ -289,17 +198,10 @@ export default function AppsideBar() {
 
       <SidebarContent>
         <SidebarNavGroup
-          label="Workspace"
-          items={navigationItems}
+          label={activeWorkspace.title}
+          items={activeWorkspace.items}
           pathname={location.pathname}
         />
-        {/* {canManage ? (
-          <SidebarNavGroup
-            label="Management"
-            items={managementItems}
-            pathname={location.pathname}
-          />
-        ) : null} */}
       </SidebarContent>
 
       <SidebarSeparator />
