@@ -5,12 +5,13 @@ import tailwindcss from '@tailwindcss/vite'
 
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react(), tailwindcss()],
-  base: '/',
+  // GitHub Pages project site base path.
+  base: mode === 'production' ? '/new-protal/' : '/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
   },
-})
+}))
