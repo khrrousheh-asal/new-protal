@@ -9,8 +9,8 @@ export default function Profile() {
   }
 
   return (
-    <main className="mx-auto flex min-h-svh w-full max-w-3xl flex-col justify-center gap-6 p-6">
-      <section className="flex flex-col gap-2">
+    <main className="flex w-full max-w-3xl flex-col gap-6">
+      <section className="flex flex-col gap-3">
         <p className="text-sm font-medium text-muted-foreground">
           Signed in as
         </p>

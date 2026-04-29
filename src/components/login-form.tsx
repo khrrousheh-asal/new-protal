@@ -36,7 +36,7 @@ export function LoginForm({
 
     try {
       await login(email.trim(), password)
-      navigate("/about", { replace: true })
+      navigate("/profile", { replace: true })
     } catch (loginError) {
       setError(
         loginError instanceof Error
