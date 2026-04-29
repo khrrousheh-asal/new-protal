@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Login from "@/pages/Login";
-import About from "@/pages/About";
+import Profile from "@/pages/Profile";
 import type { ReactNode } from "react";
 
 function PublicOnlyRoute({ children }: { children: ReactNode }) {
@@ -11,7 +11,7 @@ function PublicOnlyRoute({ children }: { children: ReactNode }) {
     return null;
   }
 
-  return user ? <Navigate to="/about" replace /> : children;
+  return user ? <Navigate to="/profile" replace /> : children;
 }
 
 function RequireAuth({ children }: { children: ReactNode }) {
@@ -31,7 +31,7 @@ function AuthRedirect() {
     return null;
   }
 
-  return <Navigate to={user ? "/about" : "/"} replace />;
+  return <Navigate to={user ? "/profile" : "/"} replace />;
 }
 
 export default function ProtectedRoute() {
@@ -46,10 +46,10 @@ export default function ProtectedRoute() {
         }
       />
       <Route
-        path="/about"
+        path="/profile"
         element={
           <RequireAuth>
-            <About />
+            <Profile />
           </RequireAuth>
         }
       />

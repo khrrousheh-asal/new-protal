@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 
-export default function About() {
+export default function Profile() {
   const { logout, user } = useAuth();
 
   if (!user) {
