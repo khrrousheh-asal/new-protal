@@ -27,8 +27,10 @@ export const authService = {
     }
 
     // never return password
-    const { password, ...safeUser } = foundUser;
-
-    return safeUser;
+    return {
+      email: foundUser.email,
+      username: foundUser.username,
+      role: foundUser.role,
+    };
   },
 };

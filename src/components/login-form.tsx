@@ -1,3 +1,5 @@
+import { useState, type FormEvent } from "react"
+import { useNavigate } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,10 +11,12 @@ import {
 } from "@/components/ui/card"
 import {
   Field,
+  FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { useAuth } from "@/hooks/useAuth"
 
 import AsalLogo from "@/assets/asal-logo.svg"
 
@@ -20,6 +24,28 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const { login, loading } = useAuth()
+  const navigate = useNavigate()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setError("")
+
+    try {
+      await login(email.trim(), password)
+      navigate("/about", { replace: true })
+    } catch (loginError) {
+      setError(
+        loginError instanceof Error
+          ? loginError.message
+          : "Invalid email or password"
+      )
+    }
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -32,14 +58,17 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form autoComplete="off">
+          <form autoComplete="off" onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@asaltech.com"
+                  value={email}
+                  placeholder="admin@asaltech.com"
+                  aria-invalid={Boolean(error)}
+                  onChange={(event) => setEmail(event.target.value)}
                   required
                 />
               </Field>
@@ -47,10 +76,20 @@ export function LoginForm({
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  aria-invalid={Boolean(error)}
+                  onChange={(event) => setPassword(event.target.value)}
+                  required
+                />
               </Field>
+              {error ? <FieldError>{error}</FieldError> : null}
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit" disabled={loading} className="w-full">
+                  {loading ? "Logging in..." : "Login"}
+                </Button>
               </Field>
             </FieldGroup>
           </form>
