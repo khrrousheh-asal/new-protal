@@ -162,7 +162,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
 
         <Badge
           variant="outline"
-          className="self-start whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium sm:self-center"
+          className="self-start inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium sm:self-center"
         >
           {onsiteIcon}
           {onsiteLabel}
