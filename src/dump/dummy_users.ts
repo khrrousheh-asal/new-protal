@@ -1,4 +1,11 @@
-import { type User } from "@/types/users";
+import {
+  type User,
+  type UserLeaveBalance,
+  type UserPlanItem,
+  type UserPlanTodoTask,
+  type UserRequest,
+  type UserSkill,
+} from "@/types/users";
 
 export const users: User[] = [
   {
@@ -6,17 +13,442 @@ export const users: User[] = [
     username: "admin",
     password: "123456",
     role: "admin",
+    profile: {
+      name: "Lena Hartmann",
+      directSupervisor: "Marcus Webb",
+      status: "active",
+      startingDate: "2022-09-01",
+      team: "Product Engineering",
+      branch: "Rawabi",
+      assignedTo: "https://maps.google.com/?q=Rawabi,Palestine",
+      onsitePreference: "hybrid",
+      employeeId: "EMP-00412",
+      avatarUrl:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&q=80",
+    },
   },
   {
     email: "user@asaltech.com",
     username: "john",
     password: "123456",
     role: "user",
+    profile: {
+      name: "John Evans",
+      directSupervisor: "Lena Hartmann",
+      status: "probation",
+      startingDate: "2025-11-18",
+      contractEnds: "2026-11-18",
+      team: "Customer Success",
+      branch: "Nablus",
+      assignedTo: "https://maps.google.com/?q=Nablus,Palestine",
+      onsitePreference: "onsite",
+      employeeId: "EMP-01984",
+      avatarUrl:
+        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80",
+    },
   },
   {
     email: "manager@asaltech.com",
     username: "sara",
     password: "123456",
     role: "manager",
+    profile: {
+      name: "Sara Nasser",
+      directSupervisor: "Nadia Karim",
+      status: "on-leave",
+      startingDate: "2020-04-15",
+      contractEnds: "2027-04-15",
+      team: "Operations",
+      branch: "Ramallah",
+      assignedTo: "https://maps.google.com/?q=Ramallah,Palestine",
+      onsitePreference: "remote",
+      employeeId: "EMP-00703",
+      avatarUrl:
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=256&q=80",
+    },
+  },
+];
+
+export const userLeaveBalances: UserLeaveBalance[] = [
+  {
+    employeeId: "EMP-00412",
+    type: "sick-leave",
+    label: "Sick Leaves",
+    taken: 3,
+    have: 10,
+    yearlyAllowance: 10,
+    note: "You have 7 sick leave days remaining over the year.",
+  },
+  {
+    employeeId: "EMP-00412",
+    type: "annual-vacation",
+    label: "Annual Vacations",
+    taken: 8,
+    have: 21,
+    yearlyAllowance: 21,
+    note: "You have 13 annual vacation days remaining over the year.",
+  },
+  {
+    employeeId: "EMP-01984",
+    type: "sick-leave",
+    label: "Sick Leaves",
+    taken: 1,
+    have: 10,
+    yearlyAllowance: 10,
+    note: "You have 9 sick leave days remaining over the year.",
+  },
+  {
+    employeeId: "EMP-01984",
+    type: "annual-vacation",
+    label: "Annual Vacations",
+    taken: 4,
+    have: 18,
+    yearlyAllowance: 18,
+    note: "You have 14 annual vacation days remaining over the year.",
+  },
+  {
+    employeeId: "EMP-00703",
+    type: "sick-leave",
+    label: "Sick Leaves",
+    taken: 6,
+    have: 12,
+    yearlyAllowance: 12,
+    note: "You have 6 sick leave days remaining over the year.",
+  },
+  {
+    employeeId: "EMP-00703",
+    type: "annual-vacation",
+    label: "Annual Vacations",
+    taken: 12,
+    have: 24,
+    yearlyAllowance: 24,
+    note: "You have 12 annual vacation days remaining over the year.",
+  },
+];
+
+export const userRequests: UserRequest[] = [
+  {
+    id: "REQ-1001",
+    employeeId: "EMP-00412",
+    request: "Flu recovery",
+    type: "sick-leave",
+    submitDate: "2026-01-09",
+    issueDate: "2026-01-10",
+    endDate: "2026-01-12",
+    status: "approved",
+    notes: "Medical certificate attached to the HR record.",
+  },
+  {
+    id: "REQ-1002",
+    employeeId: "EMP-00412",
+    request: "Spring family break",
+    type: "annual-vacation",
+    submitDate: "2026-03-02",
+    issueDate: "2026-04-06",
+    endDate: "2026-04-10",
+    status: "approved",
+    notes: "Coverage was confirmed with the team lead.",
+  },
+  {
+    id: "REQ-1003",
+    employeeId: "EMP-00412",
+    request: "Client workshop recovery",
+    type: "annual-vacation",
+    submitDate: "2026-04-18",
+    issueDate: "2026-05-07",
+    status: "pending",
+    notes: "Awaiting final delivery schedule confirmation.",
+  },
+  {
+    id: "REQ-2001",
+    employeeId: "EMP-01984",
+    request: "Dental appointment",
+    type: "sick-leave",
+    submitDate: "2026-02-11",
+    issueDate: "2026-02-12",
+    status: "approved",
+    notes: "Half-day absence approved by supervisor.",
+  },
+  {
+    id: "REQ-2002",
+    employeeId: "EMP-01984",
+    request: "Summer vacation",
+    type: "annual-vacation",
+    submitDate: "2026-04-01",
+    issueDate: "2026-07-13",
+    endDate: "2026-07-16",
+    status: "pending",
+    notes: "Waiting for support rotation lock.",
+  },
+  {
+    id: "REQ-3001",
+    employeeId: "EMP-00703",
+    request: "Medical leave",
+    type: "sick-leave",
+    submitDate: "2026-01-22",
+    issueDate: "2026-01-23",
+    endDate: "2026-01-28",
+    status: "approved",
+    notes: "Documented as part of current on-leave status.",
+  },
+  {
+    id: "REQ-3002",
+    employeeId: "EMP-00703",
+    request: "Operations planning break",
+    type: "annual-vacation",
+    submitDate: "2026-03-15",
+    issueDate: "2026-06-01",
+    endDate: "2026-06-05",
+    status: "rejected",
+    notes: "Rejected because of quarterly close overlap.",
+  },
+];
+
+export const userSkills: UserSkill[] = [
+  {
+    id: "SKL-1001",
+    employeeId: "EMP-00412",
+    name: "React",
+    category: "frontend",
+    level: 92,
+  },
+  {
+    id: "SKL-1002",
+    employeeId: "EMP-00412",
+    name: "TypeScript",
+    category: "frontend",
+    level: 88,
+  },
+  {
+    id: "SKL-1003",
+    employeeId: "EMP-00412",
+    name: "Node.js",
+    category: "backend",
+    level: 74,
+  },
+  {
+    id: "SKL-1004",
+    employeeId: "EMP-00412",
+    name: "Mentoring",
+    category: "soft-skills",
+    level: 82,
+  },
+  {
+    id: "SKL-2001",
+    employeeId: "EMP-01984",
+    name: "Customer Triage",
+    category: "soft-skills",
+    level: 78,
+  },
+  {
+    id: "SKL-2002",
+    employeeId: "EMP-01984",
+    name: "CRM Workflows",
+    category: "platform",
+    level: 72,
+  },
+  {
+    id: "SKL-2003",
+    employeeId: "EMP-01984",
+    name: "SQL Basics",
+    category: "backend",
+    level: 58,
+  },
+  {
+    id: "SKL-3001",
+    employeeId: "EMP-00703",
+    name: "Program Planning",
+    category: "soft-skills",
+    level: 91,
+  },
+  {
+    id: "SKL-3002",
+    employeeId: "EMP-00703",
+    name: "Risk Management",
+    category: "platform",
+    level: 86,
+  },
+  {
+    id: "SKL-3003",
+    employeeId: "EMP-00703",
+    name: "Stakeholder Mapping",
+    category: "soft-skills",
+    level: 84,
+  },
+];
+
+export const userPlanItems: UserPlanItem[] = [
+  {
+    id: "PLAN-1001",
+    employeeId: "EMP-00412",
+    name: "Frontend Architecture Track",
+    advisor: "Marcus Webb",
+    skills: ["React", "TypeScript", "Design Systems"],
+    description: "Lead reusable component patterns for the product pod.",
+    progress: 72,
+  },
+  {
+    id: "PLAN-1002",
+    employeeId: "EMP-00412",
+    name: "Backend Collaboration",
+    advisor: "Nadia Karim",
+    skills: ["Node.js", "API Contracts"],
+    description: "Pair with backend engineers on delivery contracts.",
+    progress: 48,
+  },
+  {
+    id: "PLAN-2001",
+    employeeId: "EMP-01984",
+    name: "Support Automation",
+    advisor: "Lena Hartmann",
+    skills: ["CRM Workflows", "SQL Basics"],
+    description: "Automate the top recurring customer request categories.",
+    progress: 41,
+  },
+  {
+    id: "PLAN-2002",
+    employeeId: "EMP-01984",
+    name: "Customer Communication",
+    advisor: "Maya Kassis",
+    skills: ["Triage", "Escalation", "Documentation"],
+    description: "Improve response templates and escalation notes.",
+    progress: 63,
+  },
+  {
+    id: "PLAN-3001",
+    employeeId: "EMP-00703",
+    name: "Operations Leadership",
+    advisor: "Nadia Karim",
+    skills: ["Planning", "Risk Management"],
+    description: "Standardize delivery governance for operations programs.",
+    progress: 81,
+  },
+];
+
+export const userPlanTodoTasks: UserPlanTodoTask[] = [
+  {
+    id: "TODO-1001-01",
+    planId: "PLAN-1001",
+    task: "Audit shared UI components",
+    description:
+      "Review reusable profile and dashboard components, then document duplicated layout patterns.",
+    references: [
+      {
+        label: "React composition",
+        url: "https://react.dev/learn/passing-props-to-a-component",
+      },
+      {
+        label: "shadcn components",
+        url: "https://ui.shadcn.com/docs/components",
+      },
+    ],
+  },
+  {
+    id: "TODO-1001-02",
+    planId: "PLAN-1001",
+    task: "Define component acceptance notes",
+    description:
+      "Create concise acceptance notes for spacing, responsive behavior, and accessibility checks.",
+    references: [
+      {
+        label: "ARIA practices",
+        url: "https://www.w3.org/WAI/ARIA/apg/",
+      },
+    ],
+  },
+  {
+    id: "TODO-1002-01",
+    planId: "PLAN-1002",
+    task: "Pair on API contract review",
+    description:
+      "Review two active backend contracts and capture frontend validation expectations.",
+    references: [
+      {
+        label: "TypeScript handbook",
+        url: "https://www.typescriptlang.org/docs/",
+      },
+    ],
+  },
+  {
+    id: "TODO-1002-02",
+    planId: "PLAN-1002",
+    task: "Map request failure states",
+    description:
+      "List expected loading, empty, error, and retry states for the shared API flows.",
+    references: [
+      {
+        label: "TanStack Query guide",
+        url: "https://tanstack.com/query/latest/docs/framework/react/guides/queries",
+      },
+    ],
+  },
+  {
+    id: "TODO-2001-01",
+    planId: "PLAN-2001",
+    task: "Identify repeat support cases",
+    description:
+      "Group the top recurring customer support requests by impact and manual effort.",
+    references: [
+      {
+        label: "HubSpot workflow guide",
+        url: "https://knowledge.hubspot.com/workflows/create-workflows",
+      },
+    ],
+  },
+  {
+    id: "TODO-2001-02",
+    planId: "PLAN-2001",
+    task: "Draft automation rules",
+    description:
+      "Write draft trigger and action rules for the highest-volume support scenario.",
+    references: [
+      {
+        label: "Automation patterns",
+        url: "https://www.atlassian.com/software/jira/guides/automation/overview",
+      },
+    ],
+  },
+  {
+    id: "TODO-2002-01",
+    planId: "PLAN-2002",
+    task: "Rewrite escalation templates",
+    description:
+      "Update escalation templates so they include impact, owner, timeline, and next action.",
+    references: [
+      {
+        label: "Plain language",
+        url: "https://www.plainlanguage.gov/guidelines/",
+      },
+    ],
+  },
+  {
+    id: "TODO-3001-01",
+    planId: "PLAN-3001",
+    task: "Standardize risk register",
+    description:
+      "Create one risk register structure for active operations programs and review cadence.",
+    references: [
+      {
+        label: "Risk register overview",
+        url: "https://www.projectmanager.com/blog/risk-register",
+      },
+    ],
+  },
+  {
+    id: "TODO-3001-02",
+    planId: "PLAN-3001",
+    task: "Prepare governance checklist",
+    description:
+      "Create a launch checklist for program scope, stakeholders, handoffs, and reporting.",
+    references: [
+      {
+        label: "PMI governance",
+        url: "https://www.pmi.org/learning/library/project-governance-principles-9944",
+      },
+      {
+        label: "RACI model",
+        url: "https://www.atlassian.com/team-playbook/plays/roles-and-responsibilities",
+      },
+    ],
   },
 ];
