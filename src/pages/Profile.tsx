@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
+import ProfileHeader from "@/components/ui/custom/personalProfiles/ProfileHeader";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Profile() {
-  const { logout, user } = useAuth();
+  const { user } = useAuth();
 
   if (!user) {
     return null;
@@ -10,18 +10,7 @@ export default function Profile() {
 
   return (
     <main className="flex w-full max-w-3xl flex-col gap-6">
-      <section className="flex flex-col gap-3">
-        <p className="text-sm font-medium text-muted-foreground">
-          Signed in as
-        </p>
-        <h1 className="text-3xl font-semibold">{user.username}</h1>
-        <p className="text-muted-foreground">{user.email}</p>
-        <p className="text-sm font-medium capitalize">Role: {user.role}</p>
-      </section>
-
-      <Button type="button" className="w-fit" onClick={logout}>
-        Logout
-      </Button>
+      <ProfileHeader user={user} />
     </main>
   );
 }

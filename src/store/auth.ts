@@ -1,7 +1,47 @@
-import type { AuthenticatedUser } from "@/services/authService";
+import type { AuthenticatedUser, UserProfile } from "@/types/users";
 import { users } from "@/dump/dummy_users";
 
 const STORAGE_KEY = "user";
+
+const EMPLOYMENT_STATUSES: UserProfile["status"][] = [
+  "active",
+  "on-leave",
+  "terminated",
+  "probation",
+];
+
+const ONSITE_PREFERENCES: UserProfile["onsitePreference"][] = [
+  "remote",
+  "onsite",
+  "hybrid",
+];
+
+const isOptionalString = (value: unknown) =>
+  typeof value === "undefined" || typeof value === "string";
+
+const isUserProfile = (value: unknown): value is UserProfile => {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const profile = value as Partial<UserProfile>;
+
+  return (
+    typeof profile.name === "string" &&
+    typeof profile.directSupervisor === "string" &&
+    typeof profile.status === "string" &&
+    EMPLOYMENT_STATUSES.includes(profile.status) &&
+    typeof profile.startingDate === "string" &&
+    isOptionalString(profile.contractEnds) &&
+    typeof profile.team === "string" &&
+    typeof profile.branch === "string" &&
+    isOptionalString(profile.assignedTo) &&
+    typeof profile.onsitePreference === "string" &&
+    ONSITE_PREFERENCES.includes(profile.onsitePreference) &&
+    typeof profile.employeeId === "string" &&
+    isOptionalString(profile.avatarUrl)
+  );
+};
 
 const isAuthenticatedUser = (value: unknown): value is AuthenticatedUser => {
   if (!value || typeof value !== "object") {
@@ -10,17 +50,25 @@ const isAuthenticatedUser = (value: unknown): value is AuthenticatedUser => {
 
   const user = value as Partial<AuthenticatedUser>;
 
-  return (
-    typeof user.email === "string" &&
-    typeof user.username === "string" &&
-    typeof user.role === "string" &&
-    users.some(
-      (dummyUser) =>
-        dummyUser.email === user.email &&
-        dummyUser.username === user.username &&
-        dummyUser.role === user.role
-    )
-  );
+  if (
+    typeof user.email !== "string" ||
+    typeof user.username !== "string" ||
+    typeof user.role !== "string" ||
+    !isUserProfile(user.profile)
+  ) {
+    return false;
+  }
+
+  const profile = user.profile;
+
+  return users.some((dummyUser) => {
+    return (
+      dummyUser.email === user.email &&
+      dummyUser.username === user.username &&
+      dummyUser.role === user.role &&
+      dummyUser.profile.employeeId === profile.employeeId
+    );
+  });
 };
 
 export const auth = {
@@ -33,7 +81,13 @@ export const auth = {
 
     try {
       const parsed = JSON.parse(stored);
-      return isAuthenticatedUser(parsed) ? parsed : null;
+
+      if (!isAuthenticatedUser(parsed)) {
+        localStorage.removeItem(STORAGE_KEY);
+        return null;
+      }
+
+      return parsed;
     } catch {
       localStorage.removeItem(STORAGE_KEY);
       return null;
