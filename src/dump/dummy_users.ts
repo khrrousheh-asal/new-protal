@@ -2,6 +2,7 @@ import {
   type User,
   type UserLeaveBalance,
   type UserPlanItem,
+  type UserPlanTodoTask,
   type UserRequest,
   type UserSkill,
 } from "@/types/users";
@@ -321,5 +322,133 @@ export const userPlanItems: UserPlanItem[] = [
     skills: ["Planning", "Risk Management"],
     description: "Standardize delivery governance for operations programs.",
     progress: 81,
+  },
+];
+
+export const userPlanTodoTasks: UserPlanTodoTask[] = [
+  {
+    id: "TODO-1001-01",
+    planId: "PLAN-1001",
+    task: "Audit shared UI components",
+    description:
+      "Review reusable profile and dashboard components, then document duplicated layout patterns.",
+    references: [
+      {
+        label: "React composition",
+        url: "https://react.dev/learn/passing-props-to-a-component",
+      },
+      {
+        label: "shadcn components",
+        url: "https://ui.shadcn.com/docs/components",
+      },
+    ],
+  },
+  {
+    id: "TODO-1001-02",
+    planId: "PLAN-1001",
+    task: "Define component acceptance notes",
+    description:
+      "Create concise acceptance notes for spacing, responsive behavior, and accessibility checks.",
+    references: [
+      {
+        label: "ARIA practices",
+        url: "https://www.w3.org/WAI/ARIA/apg/",
+      },
+    ],
+  },
+  {
+    id: "TODO-1002-01",
+    planId: "PLAN-1002",
+    task: "Pair on API contract review",
+    description:
+      "Review two active backend contracts and capture frontend validation expectations.",
+    references: [
+      {
+        label: "TypeScript handbook",
+        url: "https://www.typescriptlang.org/docs/",
+      },
+    ],
+  },
+  {
+    id: "TODO-1002-02",
+    planId: "PLAN-1002",
+    task: "Map request failure states",
+    description:
+      "List expected loading, empty, error, and retry states for the shared API flows.",
+    references: [
+      {
+        label: "TanStack Query guide",
+        url: "https://tanstack.com/query/latest/docs/framework/react/guides/queries",
+      },
+    ],
+  },
+  {
+    id: "TODO-2001-01",
+    planId: "PLAN-2001",
+    task: "Identify repeat support cases",
+    description:
+      "Group the top recurring customer support requests by impact and manual effort.",
+    references: [
+      {
+        label: "HubSpot workflow guide",
+        url: "https://knowledge.hubspot.com/workflows/create-workflows",
+      },
+    ],
+  },
+  {
+    id: "TODO-2001-02",
+    planId: "PLAN-2001",
+    task: "Draft automation rules",
+    description:
+      "Write draft trigger and action rules for the highest-volume support scenario.",
+    references: [
+      {
+        label: "Automation patterns",
+        url: "https://www.atlassian.com/software/jira/guides/automation/overview",
+      },
+    ],
+  },
+  {
+    id: "TODO-2002-01",
+    planId: "PLAN-2002",
+    task: "Rewrite escalation templates",
+    description:
+      "Update escalation templates so they include impact, owner, timeline, and next action.",
+    references: [
+      {
+        label: "Plain language",
+        url: "https://www.plainlanguage.gov/guidelines/",
+      },
+    ],
+  },
+  {
+    id: "TODO-3001-01",
+    planId: "PLAN-3001",
+    task: "Standardize risk register",
+    description:
+      "Create one risk register structure for active operations programs and review cadence.",
+    references: [
+      {
+        label: "Risk register overview",
+        url: "https://www.projectmanager.com/blog/risk-register",
+      },
+    ],
+  },
+  {
+    id: "TODO-3001-02",
+    planId: "PLAN-3001",
+    task: "Prepare governance checklist",
+    description:
+      "Create a launch checklist for program scope, stakeholders, handoffs, and reporting.",
+    references: [
+      {
+        label: "PMI governance",
+        url: "https://www.pmi.org/learning/library/project-governance-principles-9944",
+      },
+      {
+        label: "RACI model",
+        url: "https://www.atlassian.com/team-playbook/plays/roles-and-responsibilities",
+      },
+    ],
   },
 ];

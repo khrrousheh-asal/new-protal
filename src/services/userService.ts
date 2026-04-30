@@ -5,6 +5,7 @@ import type {
   User,
   UserLeaveBalance,
   UserPlanItem,
+  UserPlanTodoTask,
   UserProfile,
   UserRequest,
   UserSkill,
@@ -45,6 +46,9 @@ const getSkillsByEmployeeId = (employeeId: string): UserSkill[] =>
 const getPlanItemsByEmployeeId = (employeeId: string): UserPlanItem[] =>
   userStore.getPlanItemsByEmployeeId(employeeId);
 
+const getPlanTodoTasksByPlanId = (planId: string): UserPlanTodoTask[] =>
+  userStore.getPlanTodoTasksByPlanId(planId);
+
 const userService = {
   getAllUsers,
   getUserByEmployeeId,
@@ -52,6 +56,7 @@ const userService = {
   getRequestsByEmployeeId,
   getSkillsByEmployeeId,
   getPlanItemsByEmployeeId,
+  getPlanTodoTasksByPlanId,
 };
 
 export default userService;

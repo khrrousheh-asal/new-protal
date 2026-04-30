@@ -72,3 +72,16 @@ export interface UserPlanItem {
   description: string;
   progress: number;
 }
+
+export interface UserPlanTaskReference {
+  label: string;
+  url: string;
+}
+
+export interface UserPlanTodoTask {
+  id: string;
+  planId: string;
+  task: string;
+  description: string;
+  references: UserPlanTaskReference[];
+}
