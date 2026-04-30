@@ -27,6 +27,8 @@ import type {
   OnsitePreference,
 } from "@/types/users";
 
+const TENURE_REFERENCE_TIME = Date.now();
+
 export interface ProfileHeaderProps {
   user: AuthenticatedUser;
 }
@@ -198,7 +200,8 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
           label="Started"
           value={fmt(startingDate)}
           tooltip={`Tenure: ${Math.floor(
-            (Date.now() - new Date(startingDate).getTime()) / (1000 * 60 * 60 * 24 * 30)
+            (TENURE_REFERENCE_TIME - new Date(startingDate).getTime()) /
+              (1000 * 60 * 60 * 24 * 30)
           )} months`}
         />
         <InfoChip
