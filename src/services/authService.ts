@@ -1,16 +1,12 @@
-import {type User} from "@/types/users";
-import {users} from "@/dump/dummy_users";
+import type { AuthenticatedUser } from "@/types/users";
+import { users } from "@/dump/dummy_users";
 
 export interface LoginPayload {
   email: string;
   password: string;
 }
 
-export interface AuthenticatedUser {
-  email: string;
-  username: string;
-  role: User["role"];
-}
+export type { AuthenticatedUser };
 
 export const authService = {
   login: async (payload: LoginPayload): Promise<AuthenticatedUser> => {
@@ -18,8 +14,7 @@ export const authService = {
     await new Promise((res) => setTimeout(res, 500));
 
     const foundUser = users.find(
-      (u) =>
-        u.email === payload.email && u.password === payload.password
+      (u) => u.email === payload.email && u.password === payload.password
     );
 
     if (!foundUser) {
@@ -31,6 +26,7 @@ export const authService = {
       email: foundUser.email,
       username: foundUser.username,
       role: foundUser.role,
+      profile: foundUser.profile,
     };
   },
 };

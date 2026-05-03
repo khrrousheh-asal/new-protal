@@ -1,27 +1,27 @@
-import { Button } from "@/components/ui/button";
+import ProjectCardInfo from "@/components/ui/custom/personalProfiles/PorjectCardInfo";
+import ProfileContent from "@/components/ui/custom/personalProfiles/ProfileContent";
+import ProfileHeader from "@/components/ui/custom/personalProfiles/ProfileHeader";
 import { useAuth } from "@/hooks/useAuth";
+import projectService from "@/services/projectService";
 
 export default function Profile() {
-  const { logout, user } = useAuth();
+  const { user } = useAuth();
 
   if (!user) {
     return null;
   }
 
-  return (
-    <main className="flex w-full max-w-3xl flex-col gap-6">
-      <section className="flex flex-col gap-3">
-        <p className="text-sm font-medium text-muted-foreground">
-          Signed in as
-        </p>
-        <h1 className="text-3xl font-semibold">{user.username}</h1>
-        <p className="text-muted-foreground">{user.email}</p>
-        <p className="text-sm font-medium capitalize">Role: {user.role}</p>
-      </section>
+  const userProjects = projectService.getProjectsByEmployeeId(
+    user.profile.employeeId
+  );
 
-      <Button type="button" className="w-fit" onClick={logout}>
-        Logout
-      </Button>
+  return (
+    <main className="flex w-full flex-col gap-6 px-4 sm:px-6 lg:px-8">
+      <ProfileHeader user={user} />
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+        <ProjectCardInfo projects={userProjects} />
+        <ProfileContent user={user} />
+      </div>
     </main>
   );
 }
