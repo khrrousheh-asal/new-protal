@@ -22,6 +22,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Progress } from "@/components/ui/progress";
 import {
   Table,
@@ -38,10 +46,31 @@ interface PlanSectionProps {
   planItems: UserPlanItem[];
 }
 
+const PLAN_PAGE_SIZE = 8;
+
+const getPageNumbers = (pageCount: number) =>
+  Array.from({ length: pageCount }, (_, index) => index);
+
 export default function PlanSection({ planItems }: PlanSectionProps) {
   const [selectedPlan, setSelectedPlan] = React.useState<UserPlanItem | null>(
     null
   );
+  const [pageIndex, setPageIndex] = React.useState(0);
+
+  React.useEffect(() => {
+    setPageIndex(0);
+  }, [planItems]);
+
+  const pageCount = Math.max(1, Math.ceil(planItems.length / PLAN_PAGE_SIZE));
+  const currentPageIndex = Math.min(pageIndex, pageCount - 1);
+  const canPreviousPage = currentPageIndex > 0;
+  const canNextPage = currentPageIndex < pageCount - 1;
+
+  const paginatedPlanItems = React.useMemo(() => {
+    const start = currentPageIndex * PLAN_PAGE_SIZE;
+
+    return planItems.slice(start, start + PLAN_PAGE_SIZE);
+  }, [currentPageIndex, planItems]);
 
   const columns = React.useMemo<ColumnDef<UserPlanItem>[]>(
     () => [
@@ -90,7 +119,7 @@ export default function PlanSection({ planItems }: PlanSectionProps) {
   );
 
   const table = useReactTable({
-    data: planItems,
+    data: paginatedPlanItems,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -113,7 +142,7 @@ export default function PlanSection({ planItems }: PlanSectionProps) {
             row to view the task list.
           </CardDescription>
         </CardHeader>
-        <CardContent className="min-w-0 overflow-hidden">
+        <CardContent className="min-w-0 space-y-4 overflow-hidden">
           <Table className="table-fixed">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -176,6 +205,60 @@ export default function PlanSection({ planItems }: PlanSectionProps) {
               )}
             </TableBody>
           </Table>
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-muted-foreground">
+              Page {currentPageIndex + 1} of {pageCount}
+            </p>
+            <Pagination className="mx-0 w-auto justify-start sm:justify-end">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    aria-disabled={!canPreviousPage}
+                    tabIndex={canPreviousPage ? undefined : -1}
+                    className={
+                      canPreviousPage ? undefined : "pointer-events-none opacity-50"
+                    }
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setPageIndex((current) => Math.max(0, current - 1));
+                    }}
+                  />
+                </PaginationItem>
+                {getPageNumbers(pageCount).map((pageNumber) => (
+                  <PaginationItem key={pageNumber}>
+                    <PaginationLink
+                      href="#"
+                      isActive={pageNumber === currentPageIndex}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        setPageIndex(pageNumber);
+                      }}
+                    >
+                      {pageNumber + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    aria-disabled={!canNextPage}
+                    tabIndex={canNextPage ? undefined : -1}
+                    className={
+                      canNextPage ? undefined : "pointer-events-none opacity-50"
+                    }
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setPageIndex((current) =>
+                        Math.min(pageCount - 1, current + 1)
+                      );
+                    }}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
         </CardContent>
       </Card>
 

@@ -5,20 +5,9 @@ import {
   useReactTable,
   type ColumnDef,
 } from "@tanstack/react-table";
-import {
-  CalendarCheck2,
-  Eye,
-  HeartPulse,
-  MoreHorizontal,
-  Search,
-  Trash2,
-} from "lucide-react";
+import { CalendarCheck2, HeartPulse } from "lucide-react";
 
-import RequestForm, {
-  type RequestFormValues,
-} from "@/components/ui/custom/personalProfiles/RequestForm";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -27,26 +16,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -63,12 +39,11 @@ import type {
 } from "@/types/users";
 
 interface OverviewSectionProps {
-  employeeId: string;
   leaveBalances: UserLeaveBalance[];
   requests: UserRequest[];
 }
 
-type LogFilter = "all" | UserRequestType | UserRequestStatus;
+const REQUESTS_PAGE_SIZE = 4;
 
 const REQUEST_TYPE_LABELS: Record<UserRequestType, string> = {
   "annual-vacation": "Annual Vacation",
@@ -102,59 +77,32 @@ const formatDateRange = (request: UserRequest) =>
     ? `${formatDate(request.issueDate)} - ${formatDate(request.endDate)}`
     : formatDate(request.issueDate);
 
-const formatRequestId = () =>
-  `REQ-${Date.now().toString().slice(-6)}`;
+const getPageNumbers = (pageCount: number) =>
+  Array.from({ length: pageCount }, (_, index) => index);
 
 export default function OverviewSection({
-  employeeId,
   leaveBalances,
-  requests: initialRequests,
+  requests,
 }: OverviewSectionProps) {
-  const [requests, setRequests] = React.useState<UserRequest[]>(initialRequests);
-  const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [selectedRequest, setSelectedRequest] =
-    React.useState<UserRequest | null>(null);
-  const [search, setSearch] = React.useState("");
-  const [logFilter, setLogFilter] = React.useState<LogFilter>("all");
+  const [pageIndex, setPageIndex] = React.useState(0);
 
   React.useEffect(() => {
-    setRequests(initialRequests);
-    setSelectedRequest(null);
-  }, [initialRequests]);
+    setPageIndex(0);
+  }, [requests]);
 
-  const handleView = React.useCallback((request: UserRequest) => {
-    setSelectedRequest(request);
-    setDialogOpen(true);
-  }, []);
-
-  const handleDelete = React.useCallback((requestId: string) => {
-    setRequests((currentRequests) =>
-      currentRequests.filter((request) => request.id !== requestId)
-    );
-    setSelectedRequest((currentRequest) =>
-      currentRequest?.id === requestId ? null : currentRequest
-    );
-  }, []);
-
-  const handleAddRequest = React.useCallback(
-    (values: RequestFormValues) => {
-      const nextRequest: UserRequest = {
-        id: formatRequestId(),
-        employeeId,
-        request: `${REQUEST_TYPE_LABELS[values.type]} Request`,
-        type: values.type,
-        submitDate: new Date().toISOString().slice(0, 10),
-        issueDate: values.issueDate,
-        endDate: values.endDate,
-        status: "pending",
-        notes: values.notes,
-      };
-
-      setRequests((currentRequests) => [nextRequest, ...currentRequests]);
-      setSelectedRequest(nextRequest);
-    },
-    [employeeId]
+  const pageCount = Math.max(
+    1,
+    Math.ceil(requests.length / REQUESTS_PAGE_SIZE)
   );
+  const currentPageIndex = Math.min(pageIndex, pageCount - 1);
+  const canPreviousPage = currentPageIndex > 0;
+  const canNextPage = currentPageIndex < pageCount - 1;
+
+  const paginatedRequests = React.useMemo(() => {
+    const start = currentPageIndex * REQUESTS_PAGE_SIZE;
+
+    return requests.slice(start, start + REQUESTS_PAGE_SIZE);
+  }, [currentPageIndex, requests]);
 
   const columns = React.useMemo<ColumnDef<UserRequest>[]>(
     () => [
@@ -165,7 +113,7 @@ export default function OverviewSection({
           const request = row.original;
 
           return (
-            <div className="flex min-w-48 flex-col gap-1">
+            <div className="flex min-w-0 flex-col gap-1">
               <span className="font-medium">{request.request}</span>
               <span className="flex flex-wrap gap-1.5">
                 <Badge variant="outline">
@@ -189,68 +137,15 @@ export default function OverviewSection({
         header: "Issue Date",
         cell: ({ row }) => formatDateRange(row.original),
       },
-      {
-        id: "actions",
-        header: "",
-        cell: ({ row }) => {
-          const request = row.original;
-
-          return (
-            <div className="flex justify-end">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon-sm" aria-label="Actions">
-                    <MoreHorizontal />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    className="gap-2"
-                    onSelect={() => handleView(request)}
-                  >
-                    <Eye />
-                    View
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="gap-2 text-destructive focus:text-destructive"
-                    onSelect={() => handleDelete(request.id)}
-                  >
-                    <Trash2 />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          );
-        },
-      },
     ],
-    [handleDelete, handleView]
+    []
   );
 
   const table = useReactTable({
-    data: requests,
+    data: paginatedRequests,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
-
-  const filteredRequests = React.useMemo(() => {
-    const query = search.trim().toLowerCase();
-
-    return requests.filter((request) => {
-      const matchesSearch =
-        query.length === 0 ||
-        request.request.toLowerCase().includes(query) ||
-        request.notes.toLowerCase().includes(query) ||
-        request.id.toLowerCase().includes(query);
-      const matchesFilter =
-        logFilter === "all" ||
-        request.type === logFilter ||
-        request.status === logFilter;
-
-      return matchesSearch && matchesFilter;
-    });
-  }, [logFilter, requests, search]);
 
   return (
     <section className="space-y-5">
@@ -296,7 +191,7 @@ export default function OverviewSection({
             Current sick leave and annual vacation requests.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -340,119 +235,62 @@ export default function OverviewSection({
               )}
             </TableBody>
           </Table>
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-muted-foreground">
+              Page {currentPageIndex + 1} of {pageCount}
+            </p>
+            <Pagination className="mx-0 w-auto justify-start sm:justify-end">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    aria-disabled={!canPreviousPage}
+                    tabIndex={canPreviousPage ? undefined : -1}
+                    className={
+                      canPreviousPage ? undefined : "pointer-events-none opacity-50"
+                    }
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setPageIndex((current) => Math.max(0, current - 1));
+                    }}
+                  />
+                </PaginationItem>
+                {getPageNumbers(pageCount).map((pageNumber) => (
+                  <PaginationItem key={pageNumber}>
+                    <PaginationLink
+                      href="#"
+                      isActive={pageNumber === currentPageIndex}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        setPageIndex(pageNumber);
+                      }}
+                    >
+                      {pageNumber + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    aria-disabled={!canNextPage}
+                    tabIndex={canNextPage ? undefined : -1}
+                    className={
+                      canNextPage ? undefined : "pointer-events-none opacity-50"
+                    }
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setPageIndex((current) =>
+                        Math.min(pageCount - 1, current + 1)
+                      );
+                    }}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
         </CardContent>
       </Card>
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-h-[90vh] max-w-5xl overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Request Log</DialogTitle>
-            <DialogDescription>
-              Review request history, filter records, and add a new profile
-              request.
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedRequest ? (
-            <div className="rounded-2xl border border-border/80 bg-muted/30 p-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="outline">{selectedRequest.id}</Badge>
-                <Badge variant="outline">
-                  {REQUEST_TYPE_LABELS[selectedRequest.type]}
-                </Badge>
-                <Badge
-                  variant={REQUEST_STATUS_VARIANTS[selectedRequest.status]}
-                >
-                  {REQUEST_STATUS_LABELS[selectedRequest.status]}
-                </Badge>
-              </div>
-              <p className="mt-3 font-medium">{selectedRequest.request}</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {formatDateRange(selectedRequest)}
-              </p>
-              <p className="mt-3 text-sm">{selectedRequest.notes}</p>
-            </div>
-          ) : null}
-
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <div className="relative flex-1">
-              <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={search}
-                placeholder="Search requests"
-                className="pl-9"
-                onChange={(event) => setSearch(event.target.value)}
-              />
-            </div>
-            <Select
-              value={logFilter}
-              onValueChange={(value) => setLogFilter(value as LogFilter)}
-            >
-              <SelectTrigger className="w-full sm:w-56">
-                <SelectValue placeholder="Filter" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Requests</SelectItem>
-                <SelectItem value="annual-vacation">
-                  Annual Vacation
-                </SelectItem>
-                <SelectItem value="sick-leave">Sick Leave</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Request</TableHead>
-                <TableHead>Submit Date</TableHead>
-                <TableHead>Issue Date</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredRequests.length > 0 ? (
-                filteredRequests.map((request) => (
-                  <TableRow key={request.id}>
-                    <TableCell>
-                      <div className="flex flex-col gap-1">
-                        <span className="font-medium">{request.request}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {request.id}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>{formatDate(request.submitDate)}</TableCell>
-                    <TableCell>{formatDateRange(request)}</TableCell>
-                    <TableCell>
-                      <Badge variant={REQUEST_STATUS_VARIANTS[request.status]}>
-                        {REQUEST_STATUS_LABELS[request.status]}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    className="h-20 text-center text-muted-foreground"
-                  >
-                    No request logs match the current filter.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-
-          <div className="rounded-2xl border border-border/80 p-4">
-            <h3 className="mb-4 text-sm font-semibold">Add New</h3>
-            <RequestForm onSubmit={handleAddRequest} />
-          </div>
-        </DialogContent>
-      </Dialog>
     </section>
   );
 }

@@ -91,7 +91,6 @@ export default function ProfileContent({ user }: ProfileContentProps) {
 
       {activeSection === "overview" ? (
         <OverviewSection
-          employeeId={employeeId}
           leaveBalances={leaveBalances}
           requests={requests}
         />
